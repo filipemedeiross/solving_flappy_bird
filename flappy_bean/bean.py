@@ -20,7 +20,7 @@ class Bean:
     PATHS = ['flappy_bean/media/bean1.png',
              'flappy_bean/media/bean2.png',
              'flappy_bean/media/bean3.png',
-             'flappy_bean/media/bean4.png']
+             'flappy_bean/media/bean2.png']
     
     def __init__(self, x, y):
         self.x = x
