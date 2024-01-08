@@ -26,8 +26,8 @@ class Bean:
         self.x = x
         self.y = y
 
-        self.images = self.load_images()
-        self.n_images = len(self.images)
+        self.imgs = self.load_images()
+        self.n_imgs = len(self.imgs)
 
         self.jump()
 
@@ -36,8 +36,8 @@ class Bean:
                 for path in self.PATHS]
 
     def jump(self):
-        self.index = 0
-        self.image = self.images[self.index]
+        self.idx = 0
+        self.img = self.imgs[self.idx]
 
         self.time = 0
         self.angle = self.MAX_ROTATION
@@ -57,13 +57,22 @@ class Bean:
 
     def draw(self, screen):
         if self.angle <= self.FLY_ROTATION:
-            self.image = self.images[1]
+            self.img = self.imgs[1]
         else:
-            self.index += 1
-            self.image = self.images[self.index // self.TIME_ANIMATION % self.n_images]
+            self.idx += 1
+            self.img = self.imgs[self.idx // self.TIME_ANIMATION % self.n_imgs]
+        
+        self.img = rotate(self.img, self.angle)
+        screen.blit(self.img, (self.x, self.y))
 
-        rotated_image = rotate(self.image, self.angle)
-        screen.blit(rotated_image, (self.x, self.y))
+    @property
+    def topleft(self):
+        return self.x, self.y
+    
+    @property
+    def rect(self):
+        return self.x, self.y, self.img.get_width(), self.img.get_height()
 
-    def get_mask(self):
-        return from_surface(self.image)
+    @property
+    def mask(self):
+        return from_surface(self.img)
