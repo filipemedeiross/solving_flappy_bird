@@ -1,0 +1,2 @@
+# solving_flappy_bird_with_supervised_learning
+Solving flappy bird with supervised learning techniques
