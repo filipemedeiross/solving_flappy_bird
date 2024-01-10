@@ -1,22 +1,20 @@
 from pygame.image import load
 from pygame.transform import scale
-from .constants import SCREEN_WDTH
+from .constants import SPEED_ANIMATION, BASE_WDTH, BASE_HGHT, BASE_PATH
 
 
 class Base:
-    SPEED = 5
-
-    WDTH = SCREEN_WDTH
-    HGHT = 100
-    SIZE = WDTH, HGHT
-    PATH = 'flappy_bean/media/base.png'
+    SPEED = SPEED_ANIMATION
+    WDTH  = BASE_WDTH
+    HGHT  = BASE_HGHT
+    PATH  = BASE_PATH
 
     def __init__(self, y):
         self.y = y
         self.x0 = 0
         self.x1 = self.WDTH
 
-        self.image = scale(load(self.PATH), self.SIZE)
+        self.image = scale(load(self.PATH), (self.WDTH, self.HGHT))
 
     def move(self):
         self.x0 -= self.SPEED
@@ -30,3 +28,11 @@ class Base:
     def draw(self, screen):
         screen.blit(self.image, (self.x0, self.y))
         screen.blit(self.image, (self.x1, self.y))
+
+    @property
+    def width(self):
+        return self.WDTH
+    
+    @property
+    def height(self):
+        return self.HGHT
