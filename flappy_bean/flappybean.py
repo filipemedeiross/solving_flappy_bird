@@ -15,17 +15,31 @@ class FlappyBean:
     TAPRIGHT_PATH = 'flappy_bean/media/tap_right.png'
     GETREADY_PATH = 'flappy_bean/media/get_ready.png'
     SHARE_PATH    = 'flappy_bean/media/share.png'
-    
+
+    GAMEOVER_PATH = 'flappy_bean/media/game_over.png'
+    MENU_PATH     = 'flappy_bean/media/menu.png'
+    OK_PATH       = 'flappy_bean/media/ok.png'
     DIGITS_PATH = [f'flappy_bean/media/{i}.png' for i in range(10)]
 
+    THEME_PATH = 'flappy_bean/media/epic_at_the_jungle.mp3'
+    EFFCT_PATH = 'flappy_bean/media/gameover.mp3'
     def __init__(self):
         pygame.init()
 
         # Screen is initialized with init_game method
         self.screen = None
 
-        # Create an object to help update the grid
+        # Init the clock
         self.clock = pygame.time.Clock()
+        
+        # Init the mixer
+        self.music_game = pygame.mixer.Sound(self.THEME_PATH)
+        self.music_lose = pygame.mixer.Sound(self.EFFCT_PATH)
+
+        self.channel_music = pygame.mixer.Channel(0)
+        self.channel_effct = pygame.mixer.Channel(1)
+
+        self.music_game.set_volume(0.5)
 
         # Loading images used in the game
         self.background = pygame.transform.scale(pygame.image.load(self.BG_PATH), SCREEN_SIZE)
@@ -47,12 +61,24 @@ class FlappyBean:
         self.share = pygame.transform.scale(pygame.image.load(self.SHARE_PATH), SHARE_SIZE)
         self.share_rect = self.share.get_rect(midtop=(SCREEN_MIDW, self.get_ready_rect.bottom + 2 * SPACING))
 
+        self.game_over = pygame.transform.scale(pygame.image.load(self.GAMEOVER_PATH), GAMEOVER_SIZE)
+        self.game_over_rect = self.game_over.get_rect(center=(SCREEN_MIDW, GAMEOVER_TOP))
+
+        self.menu = pygame.transform.scale(pygame.image.load(self.MENU_PATH), MENU_SIZE)
+        self.menu_rect = self.menu.get_rect(topleft=(self.game_over_rect.left, self.game_over_rect.bottom + SPACING))
+
+        self.ok = pygame.transform.scale(pygame.image.load(self.OK_PATH), OK_SIZE)
+        self.ok_rect = self.ok.get_rect(topright=(self.game_over_rect.right, self.game_over_rect.bottom + SPACING))
+
         self.digits = [pygame.transform.scale(pygame.image.load(path), DIGITS_SIZE) for path in self.DIGITS_PATH]
         self.first_digit_rect  = self.digits[0].get_rect(topleft=(SCORE_LEFT, SCORE_TOP))
         self.second_digit_rect = self.digits[0].get_rect(topleft=(SCORE_LEFT + DIGITS_SIDE, SCORE_TOP))
+        self.third_digit_rect  = self.digits[0].get_rect(topleft=(SCORE_LEFT + 2 * DIGITS_SIDE, SCORE_TOP))
 
         # Initializing game objects
-        self.bean = Bean(BEAN_MSCW, BEAN_MSCH)
+        self.bean  = Bean(0, 0)
+        self.pipes = []
+        self.base  = Base(BASE_Y)
 
     # Method that start the game
     def init_game(self):
@@ -77,8 +103,13 @@ class FlappyBean:
 
         pygame.display.flip()  # displaying the screen
 
+        self.bean.topleft = BEAN_MSCW, BEAN_MSCH
+
+        if not self.channel_music.get_busy():
+            self.channel_music.play(self.music_game, -1)
+
         while True:
-            self.clock.tick(25)
+            self.clock.tick(FRAMERATE_MS)
 
             # Getting input from user
             for event in pygame.event.get():
@@ -103,81 +134,73 @@ class FlappyBean:
             pygame.display.update(self.bean.rect)
     
     def play(self):
-        pass
+        lose, score = self.init_variables()
 
+        while True:
+            self.clock.tick(FRAMERATE_PS)
 
-'''
-pygame.font.init()
-FONTE_PONTOS = pygame.font.SysFont('arial', 50)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    exit(0)
+                if lose:
+                    if event.type == pygame.MOUSEBUTTONDOWN:
+                        if self.menu_rect.collidepoint(event.pos):
+                            return
+                        if self.ok_rect.collidepoint(event.pos):
+                            lose, score = self.init_variables()
+                else:
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_SPACE:
+                            self.bean.jump()
 
+            if not lose:
+                self.bean.move()
+                self.base.move()
+                for pipe in self.pipes:
+                    pipe.move()
 
-def desenhar_tela(tela, passaros, canos, chao, pontos):
-    tela.blit(IMAGEM_BACKGROUND, (0, 0))
-    for passaro in passaros:
-        passaro.draw(tela)
-    for cano in canos:
-        cano.draw(tela)
+                pipe = self.pipes[0]
+                if pipe.collide(self.bean):
+                    lose = True
 
-    texto = FONTE_PONTOS.render(f"Pontuação: {pontos}", 1, (255, 255, 255))
-    tela.blit(texto, (SCREEN_WDTH - 10 - texto.get_width(), 10))
-    chao.draw(tela)
-    pygame.display.update()
+                    self.channel_music.stop()
+                    self.channel_effct.play(self.music_lose)
+                elif not pipe.passed and self.bean.x > pipe.x:
+                    score += 1
+                    pipe.passed = True
+                    self.pipes.append(Pipe(PIPE_NX))
+                elif pipe.x + pipe.pipe_top.get_width() < 0:
+                    self.pipes.pop(0)
 
+                if self.bean.bottomright[1] > self.base.y or self.bean.y < 0:
+                    lose = True
 
-def main():
-    passaros = [Bean(230, 350)]
-    chao = Base(730)
-    canos = [Pipe(700)]
-    tela = pygame.display.set_mode((SCREEN_WDTH, SCREEN_HGHT))
-    pontos = 0
-    relogio = pygame.time.Clock()
+                    self.channel_music.stop()
+                    self.channel_effct.play(self.music_lose)
+                self.screen.blit(self.background, (0, 0))
 
-    rodando = True
-    while rodando:
-        relogio.tick(30)
+                self.bean.draw(self.screen)
+                for pipe in self.pipes:
+                    pipe.draw(self.screen)
+                self.base.draw(self.screen)
 
-        # interação com o usuário
-        for evento in pygame.event.get():
-            if evento.type == pygame.QUIT:
-                rodando = False
-                pygame.quit()
-                quit()
-            if evento.type == pygame.KEYDOWN:
-                if evento.key == pygame.K_SPACE:
-                    for passaro in passaros:
-                        passaro.jump()
+                self.screen.blit(self.digits[score // 100], self.first_digit_rect)
+                self.screen.blit(self.digits[score // 10], self.second_digit_rect)
+                self.screen.blit(self.digits[score % 10], self.third_digit_rect)
 
-        # mover as coisas
-        for passaro in passaros:
-            passaro.move()
-        chao.move()
+                if lose:
+                    self.screen.blit(self.game_over, self.game_over_rect)
+                    self.screen.blit(self.menu, self.menu_rect)
+                    self.screen.blit(self.ok, self.ok_rect)
 
-        adicionar_cano = False
-        remover_canos = []
-        for cano in canos:
-            for i, passaro in enumerate(passaros):
-                if cano.collide(passaro):
-                    passaros.pop(i)
-                if not cano.passed and passaro.x > cano.x:
-                    cano.passed = True
-                    adicionar_cano = True
-            cano.move()
-            if cano.x + cano.pipe_top.get_width() < 0:
-                remover_canos.append(cano)
+                pygame.display.flip()
 
-        if adicionar_cano:
-            pontos += 1
-            canos.append(Pipe(600))
-        for cano in remover_canos:
-            canos.remove(cano)
+    def init_variables(self):
+        if not self.channel_music.get_busy():
+            self.channel_music.play(self.music_game, -1)
 
-        for i, passaro in enumerate(passaros):
-            if (passaro.y + passaro.image.get_height()) > chao.y or passaro.y < 0:
-                passaros.pop(i)
+        self.bean.topleft = BEAN_PSCW, BEAN_PSCH
+        self.pipes.clear()
+        self.pipes.append(Pipe(PIPE_X))
 
-        desenhar_tela(tela, passaros, canos, chao, pontos)
-
-
-if __name__ == '__main__':
-    main()
-'''
+        return False, 0
