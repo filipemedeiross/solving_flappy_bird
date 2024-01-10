@@ -20,8 +20,10 @@ class Pipe:
         self.x = x
         self.passed = False
 
-        self.pipe_top = scale(load(self.PATH_TOP), self.SIZE)
+        self.pipe_top  = scale(load(self.PATH_TOP), self.SIZE)
         self.pipe_base = scale(load(self.PATH_BASE), self.SIZE)
+        self.mask_top  = from_surface(self.pipe_top)
+        self.mask_base = from_surface(self.pipe_base)
 
         self.set_height()
 
@@ -38,14 +40,12 @@ class Pipe:
         screen.blit(self.pipe_base, (self.x, self.pos_base))
 
     def collide(self, obj):
-        mask = obj.get_mask()
-        top_mask = from_surface(self.pipe_top)
-        base_mask = from_surface(self.pipe_base)
+        mask = obj.mask
 
         dist_top = (self.x - obj.x, self.pos_top - round(obj.y))
         dist_base = (self.x - obj.x, self.pos_base - round(obj.y))
 
-        overlap_top = mask.overlap(top_mask, dist_top)
-        overlap_base = mask.overlap(base_mask, dist_base)
+        overlap_top = mask.overlap(self.mask_top, dist_top)
+        overlap_base = mask.overlap(self.mask_base, dist_base)
 
         return overlap_top or overlap_base
