@@ -2,19 +2,23 @@ from random import randrange
 from pygame.image import load
 from pygame.transform import scale
 from pygame.mask import from_surface
+from .constants import SPEED_ANIMATION, PIPE_DIST, \
+                       PIPE_MIN_HGHT, PIPE_MAX_HGHT, \
+                       PIPE_WDTH, PIPE_HGHT, \
+                       PIPE_PATH_TOP, PIPE_PATH_BASE
 
 
 class Pipe:
-    SPEED = 5
-    DIST = 200
-    MIN_HGHT = 50
-    MAX_HGHT = 450
+    SPEED = SPEED_ANIMATION
+    DIST  = PIPE_DIST
+    MIN_HGHT = PIPE_MIN_HGHT
+    MAX_HGHT = PIPE_MAX_HGHT
 
-    WDTH = 100
-    HGHT = 640
+    WDTH = PIPE_WDTH
+    HGHT = PIPE_HGHT
     SIZE = WDTH, HGHT
-    PATH_TOP  = 'flappy_bean/media/pipe_top.png'
-    PATH_BASE = 'flappy_bean/media/pipe_base.png'
+    PATH_TOP  = PIPE_PATH_TOP
+    PATH_BASE = PIPE_PATH_BASE
 
     def __init__(self, x):
         self.x = x
@@ -29,7 +33,7 @@ class Pipe:
 
     def set_height(self):
         self.height = randrange(self.MIN_HGHT, self.MAX_HGHT)
-        self.pos_top = self.height - self.HGHT
+        self.pos_top  = self.height - self.HGHT
         self.pos_base = self.height + self.DIST
 
     def move(self):
@@ -42,10 +46,10 @@ class Pipe:
     def collide(self, obj):
         mask = obj.mask
 
-        dist_top = (self.x - obj.x, self.pos_top - round(obj.y))
+        dist_top  = (self.x - obj.x, self.pos_top  - round(obj.y))
         dist_base = (self.x - obj.x, self.pos_base - round(obj.y))
 
-        overlap_top = mask.overlap(self.mask_top, dist_top)
+        overlap_top  = mask.overlap(self.mask_top, dist_top)
         overlap_base = mask.overlap(self.mask_base, dist_base)
 
         return overlap_top or overlap_base
