@@ -1,26 +1,27 @@
 from pygame.image import load
 from pygame.transform import scale, rotate
 from pygame.mask import from_surface
+from .constants import BEAN_SPEED, BEAN_ACCELERATION, BEAN_MAX_DELTA, \
+                       BEAN_MAX_ROTATION, BEAN_FLY_ROTATION, BEAN_MIN_ROTATION, \
+                       BEAN_SPD_ROTATION, SPEED_ANIMATION, \
+                       BEAN_WDTH, BEAN_HGHT, BEAN_PATHS
 
 
 class Bean:
-    SPEED = -10.5
-    ACCELERATION = 1.5
-    MAX_DELTA = 16
+    SPEED = BEAN_SPEED
+    ACCELERATION = BEAN_ACCELERATION
+    MAX_DELTA = BEAN_MAX_DELTA
 
-    SPD_ROTATION = 15
-    MAX_ROTATION = 30
-    FLY_ROTATION = -70
-    MIN_ROTATION = -90
-    TIME_ANIMATION = 5
+    SPD_ROTATION = BEAN_SPD_ROTATION
+    MAX_ROTATION = BEAN_MAX_ROTATION
+    FLY_ROTATION = BEAN_FLY_ROTATION
+    MIN_ROTATION = BEAN_MIN_ROTATION
+    TIME_ANIMATION = SPEED_ANIMATION
 
-    WDTH = 50
-    HGHT = 40
+    WDTH = BEAN_WDTH
+    HGHT = BEAN_HGHT
     SIZE = WDTH, HGHT
-    PATHS = ['flappy_bean/media/bean1.png',
-             'flappy_bean/media/bean2.png',
-             'flappy_bean/media/bean3.png',
-             'flappy_bean/media/bean2.png']
+    PATHS = BEAN_PATHS
     
     def __init__(self, x, y):
         self.x = x
@@ -32,8 +33,7 @@ class Bean:
         self.jump()
 
     def load_images(self):
-        return [scale(load(path), self.SIZE)
-                for path in self.PATHS]
+        return [scale(load(p), self.SIZE) for p in self.PATHS]
 
     def jump(self):
         self.idx = 0
@@ -68,6 +68,15 @@ class Bean:
     @property
     def topleft(self):
         return self.x, self.y
+    
+    @topleft.setter
+    def topleft(self, topleft):
+        self.x = topleft[0]
+        self.y = topleft[1]
+
+    @property
+    def bottomright(self):
+        return self.x + self.img.get_width(), self.y + self.img.get_height()
     
     @property
     def rect(self):
