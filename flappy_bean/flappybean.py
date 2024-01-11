@@ -71,6 +71,9 @@ class FlappyBean:
         self.third_digit_rect  = self.digits[0].get_rect(topleft=(SCORE_LEFT + 2 * DIGITS_SIDE, SCORE_TOP))
 
         # Initializing game objects
+        self.lose  = None
+        self.score = None
+
         self.bean  = Bean(BEAN_MSCW, BEAN_MSCH)
         self.base  = Base(SCREEN_HGHT - BASE_HGHT)
         self.pipes = []
@@ -87,7 +90,6 @@ class FlappyBean:
     def main_screen(self):
         self.init_main_screen()
         self.display_main_screen()
-        self.play_theme()
 
         while True:
             self.clock.tick(FRAMERATE_MS)
@@ -108,7 +110,7 @@ class FlappyBean:
             self.update_main_screen()
     
     def play(self):
-        lose, score = self.init_variables()
+        self.init_play_screen()
 
         while True:
             self.clock.tick(FRAMERATE_PS)
@@ -116,70 +118,41 @@ class FlappyBean:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     exit(0)
-                if lose:
+                if self.lose:
                     if event.type == pygame.MOUSEBUTTONDOWN:
                         if self.menu_rect.collidepoint(event.pos):
                             return
                         if self.ok_rect.collidepoint(event.pos):
-                            lose, score = self.init_variables()
+                            self.init_play_screen()
                 else:
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_SPACE:
                             self.bean.jump()
 
-            if not lose:
-                self.bean.move()
-                self.base.move()
-                for pipe in self.pipes:
-                    pipe.move()
+            if not self.lose:
+                self.move_objects()
 
                 pipe = self.pipes[0]
-                if pipe.collide(self.bean):
-                    lose = True
-
-                    self.channel_music.stop()
-                    self.channel_effct.play(self.music_lose)
+                if self.collide(self.bean, pipe, self.base):
+                    self.lose = True
+                    self.play_lose_effect()
                 elif not pipe.passed and self.bean.x > pipe.x:
-                    score += 1
+                    self.score += 1
                     pipe.passed = True
                     self.pipes.append(Pipe(PIPE_NX))
                 elif pipe.x + pipe.pipe_top.get_width() < 0:
                     self.pipes.pop(0)
 
-                if self.bean.bottomright[1] > self.base.y or self.bean.y < 0:
-                    lose = True
-
-                    self.channel_music.stop()
-                    self.channel_effct.play(self.music_lose)
-                self.screen.blit(self.background, (0, 0))
-
-                self.bean.draw(self.screen)
-                for pipe in self.pipes:
-                    pipe.draw(self.screen)
-                self.base.draw(self.screen)
-
-                self.screen.blit(self.digits[score // 100], self.first_digit_rect)
-                self.screen.blit(self.digits[score // 10], self.second_digit_rect)
-                self.screen.blit(self.digits[score % 10], self.third_digit_rect)
-
-                if lose:
-                    self.screen.blit(self.game_over, self.game_over_rect)
-                    self.screen.blit(self.menu, self.menu_rect)
-                    self.screen.blit(self.ok, self.ok_rect)
+                self.display_play_screen()
+                if self.lose:
+                    self.display_lose_options()
 
                 pygame.display.flip()
 
-    def init_variables(self):
-        self.play_theme()
-
-        self.bean.topleft = BEAN_PSCW, BEAN_PSCH
-        self.pipes.clear()
-        self.pipes.append(Pipe(PIPE_X))
-
-        return False, 0
-    
     def init_main_screen(self):
         self.bean.topleft = BEAN_MSCW, BEAN_MSCH
+
+        self.play_theme()
     
     def display_main_screen(self):
         self.screen.blit(self.background, (0, 0))
@@ -208,7 +181,53 @@ class FlappyBean:
         # Drawing the bean in the new position
         self.bean.draw(self.screen)
         pygame.display.update(self.bean.rect)
+
+    def init_play_screen(self):
+        self.lose  = False
+        self.score = 0
+
+        self.bean.topleft = BEAN_PSCW, BEAN_PSCH
+        self.pipes.clear()
+        self.pipes.append(Pipe(PIPE_X))
+
+        self.play_theme()
+
+    def display_play_screen(self):
+        self.screen.blit(self.background, (0, 0))
+
+        self.bean.draw(self.screen)
+        for pipe in self.pipes:
+            pipe.draw(self.screen)
+        self.base.draw(self.screen)
+
+        self.display_score()
+
+    def display_score(self):
+        self.screen.blit(self.digits[self.score // 100], self.first_digit_rect)
+        self.screen.blit(self.digits[self.score // 10], self.second_digit_rect)
+        self.screen.blit(self.digits[self.score % 10], self.third_digit_rect)
+
+    def display_lose_options(self):
+        self.screen.blit(self.game_over, self.game_over_rect)
+        self.screen.blit(self.menu, self.menu_rect)
+        self.screen.blit(self.ok, self.ok_rect)
+
+    def move_objects(self):
+        self.bean.move()
+        self.base.move()
+        for pipe in self.pipes:
+            pipe.move()
     
     def play_theme(self):
         if not self.channel_music.get_busy():
             self.channel_music.play(self.music_game, -1)
+
+    def play_lose_effect(self):
+        self.channel_music.stop()
+        self.channel_effct.play(self.music_lose)
+
+    @staticmethod
+    def collide(bean, pipe, base):
+        return pipe.collide(bean) or \
+               bean.bottomright[1] > base.y or \
+               bean.y < 0

@@ -1,0 +1,1 @@
+from .flappybean import FlappyBean
