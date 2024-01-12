@@ -200,6 +200,7 @@ class FlappyBean:
     def init_play_screen(self):
         self.lose  = False
         self.score = 0
+        self.data.clear()
 
         self.bean.topleft = BEAN_PSCW, BEAN_PSCH
         self.pipes.clear()
