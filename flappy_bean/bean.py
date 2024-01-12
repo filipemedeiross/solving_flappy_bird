@@ -75,6 +75,10 @@ class Bean:
         self.y = topleft[1]
 
     @property
+    def center(self):
+        return self.x + (self.img.get_width() / 2), self.y + (self.img.get_height() / 2)
+
+    @property
     def bottomright(self):
         return self.x + self.img.get_width(), self.y + self.img.get_height()
     
