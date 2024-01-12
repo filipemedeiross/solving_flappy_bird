@@ -55,5 +55,9 @@ class Pipe:
         return overlap_top or overlap_base
 
     @property
+    def right(self):
+        return self.x + self.pipe_top.get_width()
+
+    @property
     def center(self):
         return self.x + (self.WDTH / 2), self.pos_base - (self.DIST / 2)
