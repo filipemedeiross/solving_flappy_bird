@@ -1,9 +1,10 @@
+import csv
 import pygame
+import webbrowser
 from .bean import Bean
 from .pipe import Pipe
 from .base import Base
 from .constants import *
-from webbrowser import open
 
 
 class FlappyBean:
@@ -21,7 +22,11 @@ class FlappyBean:
     THEME_PATH    = GAME_THEME_PATH
     EFFCT_PATH    = GAME_EFFCT_PATH
 
-    def __init__(self):
+    def __init__(self, data_path=None):
+        # Game save data path
+        self.data_path = data_path
+
+        # Initializing the pygame
         pygame.init()
 
         # Screen is initialized with init_game method
@@ -73,6 +78,7 @@ class FlappyBean:
         # Initializing game objects
         self.lose  = None
         self.score = None
+        self.data  = []
 
         self.bean  = Bean(BEAN_MSCW, BEAN_MSCH)
         self.base  = Base(SCREEN_HGHT - BASE_HGHT)
@@ -105,7 +111,7 @@ class FlappyBean:
                     if self.finger_rect.collidepoint(event.pos):
                         return
                     if self.share_rect.collidepoint(event.pos):
-                        open('https://github.com/filipemedeiross/', new=2)
+                        webbrowser.open('https://github.com/filipemedeiross/', new=2)
 
             self.update_main_screen()
     
@@ -114,6 +120,8 @@ class FlappyBean:
 
         while True:
             self.clock.tick(FRAMERATE_PS)
+
+            jumped = False
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -127,21 +135,28 @@ class FlappyBean:
                 else:
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_SPACE:
+                            jumped = True
                             self.bean.jump()
 
             if not self.lose:
+                if self.data_path:
+                    self.data.append(self.capture_data(jumped))
+
                 self.move_objects()
 
                 pipe = self.pipes[0]
                 if self.collide(self.bean, pipe, self.base):
                     self.lose = True
                     self.play_lose_effect()
-                elif not pipe.passed and self.bean.x > pipe.x:
+                elif pipe.right < 0:
+                    self.pipes.pop(0)
+                elif not pipe.passed and self.bean.x > pipe.right:
                     self.score += 1
                     pipe.passed = True
                     self.pipes.append(Pipe(PIPE_NX))
-                elif pipe.x + pipe.pipe_top.get_width() < 0:
-                    self.pipes.pop(0)
+
+                    if self.data_path:
+                        self.save_data()
 
                 self.display_play_screen()
                 if self.lose:
@@ -217,7 +232,13 @@ class FlappyBean:
         self.base.move()
         for pipe in self.pipes:
             pipe.move()
-    
+
+    @staticmethod
+    def collide(bean, pipe, base):
+        return pipe.collide(bean) or \
+               bean.bottomright[1] > base.y or \
+               bean.y < 0
+
     def play_theme(self):
         if not self.channel_music.get_busy():
             self.channel_music.play(self.music_game, -1)
@@ -226,8 +247,18 @@ class FlappyBean:
         self.channel_music.stop()
         self.channel_effct.play(self.music_lose)
 
-    @staticmethod
-    def collide(bean, pipe, base):
-        return pipe.collide(bean) or \
-               bean.bottomright[1] > base.y or \
-               bean.y < 0
+    def capture_data(self, jumped):
+        for pipe in self.pipes:
+            if self.bean.x <= pipe.right:
+                return (pipe.center[0] - self.bean.x,
+                        pipe.center[1] - self.bean.y,
+                        jumped)
+
+    def save_data(self):
+        with open(self.data_path, 'a', newline='') as file:
+            writer = csv.writer(file)
+
+            for line in self.data:
+                writer.writerow(line)
+
+        self.data.clear()
