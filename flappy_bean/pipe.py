@@ -53,3 +53,7 @@ class Pipe:
         overlap_base = mask.overlap(self.mask_base, dist_base)
 
         return overlap_top or overlap_base
+
+    @property
+    def center(self):
+        return self.x + (self.WDTH / 2), self.pos_base - (self.DIST / 2)
