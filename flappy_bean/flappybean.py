@@ -251,8 +251,8 @@ class FlappyBean:
     def capture_data(self, jumped):
         for pipe in self.pipes:
             if self.bean.x <= pipe.right:
-                return (pipe.center[0] - self.bean.x,
-                        pipe.center[1] - self.bean.y,
+                return (pipe.center[0] - self.bean.center[0],
+                        pipe.center[1] - self.bean.center[1],
                         jumped)
 
     def save_data(self):
