@@ -1,6 +1,9 @@
 import csv
-import pygame
+import random
+import pickle
 import webbrowser
+
+import pygame
 from .bean import Bean
 from .pipe import Pipe
 from .base import Base
@@ -76,9 +79,12 @@ class FlappyBean:
         self.third_digit_rect  = self.digits[0].get_rect(topleft=(SCORE_LEFT + 2 * DIGITS_SIDE, SCORE_TOP))
 
         # Initializing game objects
-        self.lose  = None
-        self.score = None
-        self.data  = []
+        self.lose   = None
+        self.score  = None
+        self.player = None
+        self.data   = []
+
+        self.agent = self.load_agent()
 
         self.bean  = Bean(BEAN_MSCW, BEAN_MSCH)
         self.base  = Base(SCREEN_HGHT - BASE_HGHT)
@@ -108,6 +114,9 @@ class FlappyBean:
                     if event.key == pygame.K_SPACE:
                         return
                 if event.type == pygame.MOUSEBUTTONDOWN:
+                    if self.bean.get_rect.collidepoint(event.pos):
+                        self.player = False
+                        return
                     if self.finger_rect.collidepoint(event.pos):
                         return
                     if self.share_rect.collidepoint(event.pos):
@@ -132,15 +141,24 @@ class FlappyBean:
                             return
                         if self.ok_rect.collidepoint(event.pos):
                             self.init_play_screen()
-                else:
+                    if event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_SPACE:
+                            self.init_play_screen()
+                elif self.player:
                     if event.type == pygame.KEYDOWN:
                         if event.key == pygame.K_SPACE:
                             jumped = True
                             self.bean.jump()
 
             if not self.lose:
+                if not self.player:
+                    if self.predict(*self.capture_data()):
+                        jumped = True
+                        self.bean.jump()
+
                 if self.data_path:
-                    self.data.append(self.capture_data(jumped))
+                    x, y = self.capture_data()
+                    self.data.append([x, y, jumped])
 
                 self.move_objects()
 
@@ -165,7 +183,9 @@ class FlappyBean:
                 pygame.display.flip()
 
     def init_main_screen(self):
-        self.bean.topleft = BEAN_MSCW, BEAN_MSCH
+        self.player = True
+        self.bean.topleft = BEAN_MSCW, \
+                            BEAN_MSCH
 
         self.play_theme()
     
@@ -220,7 +240,7 @@ class FlappyBean:
 
     def display_score(self):
         self.screen.blit(self.digits[self.score // 100], self.first_digit_rect)
-        self.screen.blit(self.digits[self.score // 10], self.second_digit_rect)
+        self.screen.blit(self.digits[self.score // 10 % 10], self.second_digit_rect)
         self.screen.blit(self.digits[self.score % 10], self.third_digit_rect)
 
     def display_lose_options(self):
@@ -248,12 +268,11 @@ class FlappyBean:
         self.channel_music.stop()
         self.channel_effct.play(self.music_lose)
 
-    def capture_data(self, jumped):
+    def capture_data(self):
         for pipe in self.pipes:
             if self.bean.x <= pipe.right:
                 return (pipe.center[0] - self.bean.center[0],
-                        pipe.center[1] - self.bean.center[1],
-                        jumped)
+                        pipe.center[1] - self.bean.center[1])
 
     def save_data(self):
         with open(self.data_path, 'a', newline='') as file:
@@ -263,3 +282,15 @@ class FlappyBean:
                 writer.writerow(line)
 
         self.data.clear()
+
+    def load_agent(self):
+        path = random.choice([DECISION_TREE_PATH,
+                              LOGISTIC_REGR_PATH])
+
+        with open(path, 'rb') as f:
+            agent = pickle.load(f)
+
+        return agent
+    
+    def predict(self, x, y):
+        return self.agent.predict([[x, y]])
