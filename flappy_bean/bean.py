@@ -85,6 +85,10 @@ class Bean:
     @property
     def rect(self):
         return self.x, self.y, self.img.get_width(), self.img.get_height()
+    
+    @property
+    def get_rect(self):
+        return self.img.get_rect(topleft=(self.x, self.y))
 
     @property
     def mask(self):
