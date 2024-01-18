@@ -24,7 +24,7 @@ If the bean collides with the sky, ground or one of the pipes, the player loses 
 
 ## Intelligent Agent Strategies
 
-To address this problem, the supervised learning approach was used, more specifically, the techniques of logistic regression, decision tree and support vector machine. As a first step, game play data was captured as the bean was successful in getting past a pipe:
+To address this problem, the supervised learning approach was used, more specifically, the techniques of logistic regression, decision tree and support vector machine (in this brief documentation, the first two will be addressed). As a first step, game play data was captured as the bean was successful in getting past a pipe:
 
 <p align="center"> 
     <img src="./examples/capture_data.png" width="300" height="500">
@@ -36,7 +36,7 @@ When balancing the samples we are left with the following set of data:
     <img src="./examples/data.png" width="450" height="350">
 </p>
 
-As the collected data is limited to the game screen, it is presented in a well-defined way with the only difference being the x-axis which is mirrored in relation to the real game. As we tested the models in the game environment itself, the data was not split between training and testing sets.
+As the collected data is limited to the game screen, it is presented in a well-defined way with the only difference being the x-axis which is mirrored to faithfully represent the real game. As we tested the models in the game environment itself, the data was not split between training and testing sets.
 
 When training the logistic regression model, we obtained a decision boundary that describes a straight line that fits the data and proved to be invincible when put to play the game:
 
@@ -44,13 +44,13 @@ When training the logistic regression model, we obtained a decision boundary tha
     <img src="./examples/decision_boundary_logistic_regression.png" width="450" height="350">
 </p>
 
-When training a decision tree, we must first keep in mind that it cuts the data from each node and that these are parallel to the variable axes. When observing the decision boundary and understanding it in a less fragmented way than it is presented, we realize that the main cutoff that defines between jumping or not jumping is close to 0 on the axis of the vertical distance that represents the center of the gap between the pipes:
+When training a decision tree, we must first keep in mind that it cuts the data from each node and that these are parallel to the variable axes. When observing the decision boundary and understanding it, we realize that the main cutoff that defines between jumping or not jumping is close to 0 (more specifically -41.75) on the axis of the vertical distance that represents the center of the gap between the pipes:
 
 <p align="center"> 
     <img src="./examples/decision_boundary_decision_tree.png" width="450" height="350">
 </p>
 
-Interpreting the result of the decision tree, we realize that the bean always wants to get closer to the height of the center of the gap between the pipes and stay there. Therefore, when recovering the importance of the variables, we found that the vertical distance has 97% relevance for reducing entropy in the data.
+Interpreting the result of the decision tree, we realize that the bean always wants to get closer to the height of the center of the gap between the pipes and stay there. Therefore, when recovering the importance of the variables, we found that the vertical distance has the only relevance parameters for reducing entropy in the data.
 
 In the end, we got two invincible models in the game. Next, a gif is displayed with the execution of one of the ML models in the game environment:
 
