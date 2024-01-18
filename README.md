@@ -75,6 +75,7 @@ flappy_bean/                         Top-level package
               svm_rbf.pkl
       data/
               flight_bean.csv        Data collected from game matches
+              new_flight_bean.csv
 ```
 ## Running the Game
 
