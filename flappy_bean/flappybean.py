@@ -284,8 +284,9 @@ class FlappyBean:
         self.data.clear()
 
     def load_agent(self):
-        path = random.choice([DECISION_TREE_PATH,
-                              LOGISTIC_REGR_PATH])
+        path = random.choice([LOGISTIC_REGR_PATH,
+                              DECISION_TREE_PATH,
+                              SVM_RBF_PATH])
 
         with open(path, 'rb') as f:
             agent = pickle.load(f)

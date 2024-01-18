@@ -8,6 +8,7 @@ SPEED_ANIMATION = 5
 
 DECISION_TREE_PATH = 'flappy_bean/models/dtc.pkl'
 LOGISTIC_REGR_PATH = 'flappy_bean/models/log_reg.pkl'
+SVM_RBF_PATH       = 'flappy_bean/models/svm_rbf.pkl'
 
 # Dimensions
 SCREEN_WDTH = 500
