@@ -52,7 +52,7 @@ When training a decision tree, we must first keep in mind that it cuts the data 
 
 Interpreting the result of the decision tree, we realize that the bean always wants to get closer to the height of the center of the gap between the pipes and stay there. Therefore, when recovering the importance of the variables, we found that the vertical distance has the only relevance parameters for reducing entropy in the data.
 
-In the end, we got two invincible models in the game. Next, a gif is displayed with the execution of one of the ML models in the game environment:
+In the end, we got three invincible models in the game. Next, a gif is displayed with the execution of one of the ML models in the game environment:
 
 <p align="center"> 
     <img src="./examples/ai.gif" width="300" height="500">
@@ -71,7 +71,8 @@ flappy_bean/                         Top-level package
               ...
       models/                        File with the trained ML models
               log_reg.pkl
-              dtc.pkl          
+              dtc.pkl
+              svm_rbf.pkl
       data/
               flight_bean.csv        Data collected from game matches
 ```
