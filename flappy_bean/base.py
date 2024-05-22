@@ -1,38 +1,43 @@
 from pygame.image import load
 from pygame.transform import scale
-from .constants import SPEED_ANIMATION, BASE_WDTH, BASE_HGHT, BASE_PATH
+from .constants import BASE_PATH, \
+                       BASE_WDTH, \
+                       BASE_HGHT, \
+                       SPEED_ANIMATION
 
 
 class Base:
     SPEED = SPEED_ANIMATION
+
     WDTH  = BASE_WDTH
     HGHT  = BASE_HGHT
+    SIZE  = WDTH, HGHT
     PATH  = BASE_PATH
 
     def __init__(self, y):
+        self.x = 0
         self.y = y
-        self.x0 = 0
-        self.x1 = self.WDTH
 
-        self.image = scale(load(self.PATH), (self.WDTH, self.HGHT))
+        self.image = self.load_image(self.PATH, self.SIZE)
 
     def move(self):
-        self.x0 -= self.SPEED
-        self.x1 -= self.SPEED
+        self.x -= self.SPEED
 
-        if self.x0 + self.WDTH < 0:
-            self.x0 = self.x1 + self.WDTH
-        elif self.x1 + self.WDTH < 0:
-            self.x1 = self.x0 + self.WDTH
+        if self.x + self.width < 0:
+            self.x += self.width
 
-    def draw(self, screen):
-        screen.blit(self.image, (self.x0, self.y))
-        screen.blit(self.image, (self.x1, self.y))
+    def draw(self, surface):
+        surface.blit(self.image, (self.x, self.y))
+        surface.blit(self.image, (self.x + self.width, self.y))
 
     @property
     def width(self):
         return self.WDTH
-    
+
     @property
     def height(self):
         return self.HGHT
+
+    @staticmethod
+    def load_image(path, size):
+        return scale(load(path), size)
