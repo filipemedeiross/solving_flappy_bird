@@ -55,12 +55,16 @@ class Pipe:
         return overlap_top or overlap_base
 
     @property
-    def right(self):
-        return self.x + self.WDTH
+    def centerx(self):
+        return self.x + (self.WDTH / 2)
 
     @property
-    def center(self):
-        return self.x + (self.WDTH / 2), self.pos_base - (self.DIST / 2)
+    def centery(self):
+        return self.pos_base - (self.DIST / 2)
+
+    @property
+    def right(self):
+        return self.x + self.WDTH
 
     @staticmethod
     def load_image(path, size):
