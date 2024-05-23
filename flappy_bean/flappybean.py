@@ -12,8 +12,6 @@ from .constants import *
 
 class FlappyBean:
     def __init__(self, data_path):
-        self.data_path = data_path
-
         pygame.init()
 
         # Creating the screen, clock and mixer
@@ -56,24 +54,23 @@ class FlappyBean:
         self.ok = self.load_image(GAME_OK_PATH, OK_SIZE)
         self.ok_rect = self.ok.get_rect(topright=(self.game_over_rect.right, self.game_over_rect.bottom + SPACING))
 
-        self.digits = [self.load_image(p, DIGITS_SIZE) for p in GAME_DIGITS_PATH]
-        self.first_digit_rect  = self.digits[0].get_rect(topleft=(SCORE_LEFT, SCORE_TOP))
-        self.second_digit_rect = self.digits[0].get_rect(topleft=(SCORE_LEFT + DIGITS_SIDE, SCORE_TOP))
+        self.digits = [self.load_image(path, DIGITS_SIZE) for path in GAME_DIGITS_PATH]
+        self.first_digit_rect  = self.digits[0].get_rect(topleft=(SCORE_LEFT                  , SCORE_TOP))
+        self.second_digit_rect = self.digits[0].get_rect(topleft=(SCORE_LEFT +     DIGITS_SIDE, SCORE_TOP))
         self.third_digit_rect  = self.digits[0].get_rect(topleft=(SCORE_LEFT + 2 * DIGITS_SIDE, SCORE_TOP))
 
         # Initializing game objects
-        self.lose   = None
-        self.score  = None
-        self.player = None
-        self.data   = []
-
-        self.agent = self.load_agent()
-
-        self.bean  = Bean(BEAN_MSCW, BEAN_MSCH)
-        self.base  = Base(SCREEN_HGHT - BASE_HGHT)
+        self.bean  = Bean()
+        self.base  = Base(BASE_TOP)
         self.pipes = []
 
-    def init_game(self):#
+        self.load_agent()
+
+        self.data_path = data_path
+        if data_path:
+            self.data = []
+
+    def init_game(self):
         while True:
             self.main_screen()
             self.play()
@@ -163,8 +160,8 @@ class FlappyBean:
 
     def init_main_screen(self):#
         self.player = True
-        self.bean.topleft = BEAN_MSCW, \
-                            BEAN_MSCH
+        self.bean.center = SCREEN_MIDW, \
+                           SCREEN_MIDH
 
         self.play_theme()
     
@@ -266,7 +263,7 @@ class FlappyBean:
                               SVM_RBF_PATH])
 
         with open(path, 'rb') as f:
-            return pickle.load(f)
+            self.agent = pickle.load(f)
 
     def predict(self, xy):
         return self.agent.predict([xy])
