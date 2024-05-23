@@ -24,7 +24,7 @@ class Bean:
     SIZE = WDTH, HGHT
     PATHS = BEAN_PATHS
 
-    def __init__(self, x, y):
+    def __init__(self, x=0, y=0):
         self.x = x
         self.y = y
 
@@ -101,6 +101,15 @@ class Bean:
     @property
     def centery(self):
         return self.y + self.height / 2
+
+    @property
+    def center(self):
+        return self.centerx, self.centery
+
+    @center.setter
+    def center(self, topleft):
+        self.x = topleft[0] - self.width  / 2
+        self.y = topleft[1] - self.height / 2
 
     @property
     def bottom(self):
