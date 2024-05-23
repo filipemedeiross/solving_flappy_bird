@@ -1,7 +1,7 @@
 from pygame.image import load
 from pygame.transform import scale, rotate
 from pygame.mask import from_surface
-from .constants import BEAN_SPEED, BEAN_ACCELERATION, SPEED_ANIMATION,          \
+from .constants import BEAN_SPEED, BEAN_ACCELERATION, TIME_ANIMATION,           \
                        BEAN_SPD_ROTATION, BEAN_MAX_TIME, BEAN_MAX_DELTA,        \
                        BEAN_FLY_ROTATION, BEAN_MIN_ROTATION, BEAN_MAX_ROTATION, \
                        BEAN_WDTH, BEAN_HGHT, BEAN_PATHS
@@ -17,7 +17,7 @@ class Bean:
     MAX_ROTATION = BEAN_MAX_ROTATION
     MIN_ROTATION = BEAN_MIN_ROTATION
     FLY_ROTATION = BEAN_FLY_ROTATION
-    TIME_ANIMATION = SPEED_ANIMATION
+    TIME_ANIMATION = TIME_ANIMATION
 
     WDTH = BEAN_WDTH
     HGHT = BEAN_HGHT
