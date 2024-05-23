@@ -99,13 +99,11 @@ class FlappyBean:
 
             self.update_main_screen()
 
-    def play(self):#
+    def play(self):
         self.init_play_screen()
 
         while True:
             self.clock.tick(FRAMERATE_PS)
-
-            jumped = False
 
             for event in pygame.event.get():
                 if event.type == QUIT:
@@ -122,36 +120,20 @@ class FlappyBean:
                 elif self.player:
                     if event.type == KEYDOWN:
                         if event.key == K_SPACE:
-                            jumped = True
-                            self.bean.jump()
+                            self.jump()
 
             if not self.lose:
                 if not self.player:
                     if self.predict(self.capture_data()):
-                        jumped = True
-                        self.bean.jump()
+                        self.jump()
 
                 if self.data_path:
                     x, y = self.capture_data()
-                    self.data.append([x, y, jumped])
+                    self.data.append([x, y, self.jumped])
 
-                self.move_objects()
-
-                pipe = self.pipes[0]
-                if self.collide(self.bean, pipe, self.base):
-                    self.lose = True
-                    self.play_lose_effect()
-                elif pipe.right < 0:
-                    self.pipes.pop(0)
-                elif not pipe.passed and self.bean.x > pipe.right:
-                    self.score += 1
-                    pipe.passed = True
-                    self.pipes.append(Pipe(PIPE_NX))
-
-                    if self.data_path:
-                        self.save_data()
-
+                self.update_play_screen()
                 self.display_play_screen()
+
                 if self.lose:
                     self.display_lose_options()
 
@@ -191,19 +173,21 @@ class FlappyBean:
 
         pygame.display.update(self.bean.rect)
 
-    def init_play_screen(self):#
-        self.lose  = False
-        self.score = 0
+    def init_play_screen(self):
+        self.score  = 0
+        self.lose   = False
+        self.jumped = False
+
         if self.data_path:
             self.data.clear()
 
-        self.bean.topleft = BEAN_PSCW, BEAN_PSCH
+        self.bean.topleft = BEAN_PSC
         self.pipes.clear()
         self.pipes.append(Pipe(PIPE_X))
 
         self.play_theme()
 
-    def display_play_screen(self):#
+    def display_play_screen(self):
         self.screen.blit(self.bg, (0, 0))
 
         self.bean.draw(self.screen)
@@ -213,21 +197,44 @@ class FlappyBean:
 
         self.display_score()
 
-    def display_score(self):#
-        self.screen.blit(self.digits[self.score // 100], self.first_digit_rect)
+    def update_play_screen(self):
+        self.move_objects()
+
+        pipe = self.pipes[0]
+        if self.collide(self.bean, pipe, self.base):
+            self.lose = True
+            self.play_lose_effect()
+        elif pipe.right < 0:
+            self.pipes.pop(0)
+        elif not pipe.passed and self.bean.x > pipe.right:
+            self.score += 1
+            pipe.passed = True
+
+            self.pipes.append(Pipe(PIPE_NX))
+
+            if self.data_path:
+                self.save_data()
+
+    def display_score(self):
+        self.screen.blit(self.digits[self.score // 100    ], self.first_digit_rect )
         self.screen.blit(self.digits[self.score // 10 % 10], self.second_digit_rect)
-        self.screen.blit(self.digits[self.score % 10], self.third_digit_rect)
+        self.screen.blit(self.digits[self.score       % 10], self.third_digit_rect )
 
-    def display_lose_options(self):#
+    def display_lose_options(self):
         self.screen.blit(self.game_over, self.game_over_rect)
-        self.screen.blit(self.menu, self.menu_rect)
-        self.screen.blit(self.ok, self.ok_rect)
+        self.screen.blit(self.menu     , self.menu_rect     )
+        self.screen.blit(self.ok       , self.ok_rect       )
 
-    def move_objects(self):#
+    def jump(self):
+        self.bean.jump()
+
+        self.jumped = True
+
+    def move_objects(self):
         self.bean.move()
-        self.base.move()
         for pipe in self.pipes:
             pipe.move()
+        self.base.move()
 
     @staticmethod
     def collide(bean, pipe, base):
