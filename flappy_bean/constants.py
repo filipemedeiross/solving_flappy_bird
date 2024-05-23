@@ -1,9 +1,12 @@
-# Defining the constants
+from pygame.locals import *
+
 
 # Settings
+
 FRAMERATE_MS = 25
 FRAMERATE_PS = 30
 
+TIME_ANIMATION  = 3
 SPEED_ANIMATION = 5
 
 DECISION_TREE_PATH = 'flappy_bean/models/dtc.pkl'
@@ -11,6 +14,7 @@ LOGISTIC_REGR_PATH = 'flappy_bean/models/log_reg.pkl'
 SVM_RBF_PATH       = 'flappy_bean/models/svm_rbf.pkl'
 
 # Dimensions
+
 SCREEN_WDTH = 500
 SCREEN_HGHT = 700
 SCREEN_MIDW = SCREEN_WDTH / 2
@@ -53,27 +57,31 @@ PIPE_NX = 600
 # Constants of the game's classes
 BEAN_SPEED = -10.5
 BEAN_ACCELERATION = 1.5
-BEAN_MAX_DELTA = 16
+BEAN_MAX_TIME  = 8
+BEAN_MAX_DELTA = 18
 BEAN_SPD_ROTATION = 15
 BEAN_MAX_ROTATION = 30
 BEAN_FLY_ROTATION = -70
 BEAN_MIN_ROTATION = -90
 BEAN_WDTH = 50
 BEAN_HGHT = 40
-BEAN_PATHS = ('flappy_bean/media/bean1.png',
-              'flappy_bean/media/bean2.png',
-              'flappy_bean/media/bean3.png',
-              'flappy_bean/media/bean2.png')
 
 BASE_WDTH = SCREEN_WDTH
 BASE_HGHT = 80
-BASE_PATH = 'flappy_bean/media/base.png'
 
 PIPE_DIST = 200
 PIPE_MIN_HGHT = 0
 PIPE_MAX_HGHT = SCREEN_HGHT - (BASE_HGHT + PIPE_DIST)
 PIPE_WDTH = 100
 PIPE_HGHT = PIPE_MAX_HGHT
+
+# File path
+
+BEAN_PATHS = 'flappy_bean/media/bean1.png', \
+             'flappy_bean/media/bean2.png', \
+             'flappy_bean/media/bean3.png', \
+             'flappy_bean/media/bean2.png'
+BASE_PATH  = 'flappy_bean/media/base.png'
 PIPE_PATH_TOP  = 'flappy_bean/media/pipe_top.png'
 PIPE_PATH_BASE = 'flappy_bean/media/pipe_base.png'
 
