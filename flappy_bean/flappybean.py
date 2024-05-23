@@ -158,13 +158,12 @@ class FlappyBean:
                 pygame.display.flip()
 
     def init_main_screen(self):
+        self.bean.center = SCREEN_MIDD
         self.player = True
-        self.bean.center = SCREEN_MIDW, \
-                           SCREEN_MIDH
 
         self.play_theme()
 
-    def display_main_screen(self):#
+    def display_main_screen(self):
         self.screen.blit(self.bg, (0, 0))
 
         self.screen.blit(self.flappy, self.flappy_rect)
@@ -176,20 +175,20 @@ class FlappyBean:
 
         pygame.display.flip()
 
-    def update_main_screen(self):#
+    def update_main_screen(self):
         # Clearing current bean position
         self.screen.blit(self.bg,
                          self.bean.topleft,
                          area=self.bean.rect)
         pygame.display.update(self.bean.rect)
-        
-        # Moving the bean
+
+        # Moving the bean and drawing it
         if self.bean.y >= SCREEN_MIDH:
             self.bean.jump()
-        self.bean.move()
 
-        # Drawing the bean in the new position
+        self.bean.move()
         self.bean.draw(self.screen)
+
         pygame.display.update(self.bean.rect)
 
     def init_play_screen(self):#
