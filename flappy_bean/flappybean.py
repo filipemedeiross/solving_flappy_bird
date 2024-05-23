@@ -89,16 +89,16 @@ class FlappyBean:
                     if event.key == K_SPACE:
                         return
                 if event.type == MOUSEBUTTONDOWN:
+                    if self.finger_rect.collidepoint(event.pos):
+                        return
                     if self.bean.get_rect.collidepoint(event.pos):
                         self.player = False
-                        return
-                    if self.finger_rect.collidepoint(event.pos):
                         return
                     if self.share_rect.collidepoint(event.pos):
                         webbrowser.open('https://github.com/filipemedeiross/', new=2)
 
             self.update_main_screen()
-    
+
     def play(self):#
         self.init_play_screen()
 
