@@ -75,17 +75,16 @@ class FlappyBean:
             self.main_screen()
             self.play()
 
-    def main_screen(self):#
+    def main_screen(self):
         self.init_main_screen()
         self.display_main_screen()
 
         while True:
             self.clock.tick(FRAMERATE_MS)
 
-            # Getting input from user
             for event in pygame.event.get():
                 if event.type == QUIT:
-                    exit(0)  # leaving the game
+                    exit(0)
                 if event.type == KEYDOWN:
                     if event.key == K_SPACE:
                         return
@@ -158,13 +157,13 @@ class FlappyBean:
 
                 pygame.display.flip()
 
-    def init_main_screen(self):#
+    def init_main_screen(self):
         self.player = True
         self.bean.center = SCREEN_MIDW, \
                            SCREEN_MIDH
 
         self.play_theme()
-    
+
     def display_main_screen(self):#
         self.screen.blit(self.bg, (0, 0))
 
@@ -196,7 +195,8 @@ class FlappyBean:
     def init_play_screen(self):#
         self.lose  = False
         self.score = 0
-        self.data.clear()
+        if self.data_path:
+            self.data.clear()
 
         self.bean.topleft = BEAN_PSCW, BEAN_PSCH
         self.pipes.clear()
@@ -231,16 +231,16 @@ class FlappyBean:
             pipe.move()
 
     @staticmethod
-    def collide(bean, pipe, base):#
-        return pipe.collide(bean) or \
-               bean.bottom >= base.y or \
-               bean.y < 0
+    def collide(bean, pipe, base):
+        return pipe.collide(bean)    or \
+               base.y <= bean.bottom or \
+               bean.y <= 0
 
-    def play_theme(self):#
+    def play_theme(self):
         if not self.channel_music.get_busy():
             self.channel_music.play(self.music_game, -1)
 
-    def play_lose_effect(self):#
+    def play_lose_effect(self):
         self.channel_music.stop()
         self.channel_effct.play(self.music_lose)
 
