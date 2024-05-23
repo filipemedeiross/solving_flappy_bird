@@ -56,11 +56,11 @@ class Pipe:
 
     @property
     def centerx(self):
-        return self.x + (self.WDTH / 2)
+        return self.x + self.WDTH / 2
 
     @property
     def centery(self):
-        return self.pos_base - (self.DIST / 2)
+        return self.pos_base - self.DIST / 2
 
     @property
     def right(self):
