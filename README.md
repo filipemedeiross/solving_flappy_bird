@@ -145,4 +145,4 @@ Sklearn: <https://scikit-learn.org/stable/modules/classes.html>
 
 Pygame: <https://www.pygame.org/docs/>
 
-Images used: <https://opengameart.org/>
+Images and sounds used: <https://opengameart.org/>
