@@ -63,8 +63,8 @@ When training the logistic regression model, we obtained a decision boundary tha
 When training a decision tree, we must first keep in mind that it cuts the data from each node and that these are parallel to the variable axes. When observing the decision boundary and understanding it, we realize that the main cutoff that defines between jumping or not jumping is close to 0 (more specifically -41.75) on the axis of the vertical distance that represents the center of the gap between the pipes:
 
 <p align="center">
-    <img src="./examples/decision_tree.png"                   width="450" height="350">
-    <img src="./examples/decision_boundary_decision_tree.png" width="450" height="350">
+    <img src="./examples/decision_tree.png"                   width="350" height="300">
+    <img src="./examples/decision_boundary_decision_tree.png" width="350" height="300">
 </p>
 
 
