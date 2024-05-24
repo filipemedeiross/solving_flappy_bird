@@ -1,10 +1,12 @@
 from pygame.image import load
 from pygame.transform import scale, rotate
 from pygame.mask import from_surface
-from .constants import BEAN_SPEED, BEAN_ACCEL, TIME_ANIMATION,                  \
-                       BEAN_SPD_ROTATION, BEAN_MAX_TIME, BEAN_MAX_DELTA,        \
-                       BEAN_FLY_ROTATION, BEAN_MIN_ROTATION, BEAN_MAX_ROTATION, \
-                       BEAN_WDTH, BEAN_HGHT, BEAN_PATHS
+from .constants import BEAN_PATHS, BEAN_SPEED, BEAN_ACCEL,   \
+                       TIME_ANIMATION, BEAN_MAX_TIME,        \
+                       BEAN_TIME_JUMP, BEAN_MAX_DELTA,       \
+                       BEAN_SPD_ROTATION, BEAN_FLY_ROTATION, \
+                       BEAN_MIN_ROTATION, BEAN_MAX_ROTATION, \
+                       BEAN_WDTH, BEAN_HGHT
 
 
 class Bean:
@@ -17,7 +19,9 @@ class Bean:
     MAX_ROTATION = BEAN_MAX_ROTATION
     MIN_ROTATION = BEAN_MIN_ROTATION
     FLY_ROTATION = BEAN_FLY_ROTATION
-    TIME_ANIMATION = TIME_ANIMATION
+
+    TIME_JUMP = BEAN_TIME_JUMP
+    TIME_ANIM = TIME_ANIMATION
 
     WDTH = BEAN_WDTH
     HGHT = BEAN_HGHT
@@ -27,17 +31,19 @@ class Bean:
     def __init__(self, x=0, y=0):
         self.x = x
         self.y = y
+        self.time = self.TIME_JUMP
 
         self.load_images()
         self.jump()
 
     def jump(self):
-        self.idx = 0
-        self.img = self.imgs[self.idx]
+        if self.time >= self.TIME_ANIM:
+            self.idx = 0
+            self.img = self.imgs[self.idx]
 
-        self.time   = 0
-        self.angle  = self.MAX_ROTATION
-        self.angley = self.y
+            self.time   = 0
+            self.angle  = self.MAX_ROTATION
+            self.angley = self.y
 
     def move(self):
         if self.time > self.MAX_TIME:
@@ -127,7 +133,7 @@ class Bean:
     def id_img(self):
         self.idx += 1
 
-        return self.idx // self.TIME_ANIMATION % self.n_imgs
+        return self.idx // self.TIME_ANIM % self.n_imgs
 
     @staticmethod
     def load_image(path, size):
