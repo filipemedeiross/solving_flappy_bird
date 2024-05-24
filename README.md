@@ -37,13 +37,10 @@ If the bean collides with the sky, ground or one of the pipes, the player loses 
 
 To address this problem, the supervised learning approach was used, more specifically, the techniques of logistic regression, decision tree, gaussian naive bayes and support vector machine (in this brief documentation, the first two will be addressed). Data was collected and refined using the following steps:
 
-**1**. Game play data was captured as the bean was successful in getting past a pipe
-
-**2**. This data was used to train less robust initial models
-
-**3**. The created models were set to play, and the data were collected
-
-**4**. The new data was used to train more robust models
+1. Game play data was captured as the bean was successful in getting past a pipe
+2. This data was used to train less robust initial models
+3. The created models were set to play, and the data were collected
+4. The new data was used to train more robust models
 
 <p align="center"> 
     <img src="./examples/capture_data.png" width="250" height="400">
